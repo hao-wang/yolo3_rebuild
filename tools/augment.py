@@ -12,17 +12,17 @@ import sequence
 import xml.etree.ElementTree as ET
 
 
-flags.DEFINE_string("img_src_dir",
+flags.DEFINE_string("image_source_dir",
                     "/Users/hao/Projects/dataset/FC_1.0_offline_extension/DB/images",
                     "image source directory")
-flags.DEFINE_string("annot_src_dir",
+flags.DEFINE_string("annot_source_dir",
                     "./data/FC_offline/Annotations",
                     "annotation source directory")
 
-flags.DEFINE_string("img_out_dir",
+flags.DEFINE_string("image_output_dir",
                     "./data/FC_aug/JPEGImages",
                     "augmented images")
-flags.DEFINE_string("annot_out_dir",
+flags.DEFINE_string("annot_output_dir",
                     "./data/FC_aug/Annotations",
                     "augmented images' annotations.")
 flags.DEFINE_integer("augment_size",
@@ -31,15 +31,15 @@ flags.DEFINE_integer("augment_size",
 
 
 def augment(augment_size=None):
-    if not os.path.exists(FLAGS.annot_out_dir):
-        os.mkdir(FLAGS.annot_out_dir)
-    if not os.path.exists(FLAGS.img_out_dir):
-        os.mkdir(FLAGS.img_out_dir)
+    if not os.path.exists(FLAGS.annot_output_dir):
+        os.mkdir(FLAGS.annot_output_dir)
+    if not os.path.exists(FLAGS.image_output_dir):
+        os.mkdir(FLAGS.image_output_dir)
 
     aug_size = augment_size or FLAGS.augment_size
 
     seq = sequence.get()
-    for fn in glob.glob(FLAGS.annot_src_dir+'/*'):
+    for fn in glob.glob(FLAGS.annot_source_dir+'/*'):
         print(fn)
         stree = ET.parse(open(fn, 'r'))
         source_root = stree.getroot()
@@ -47,12 +47,12 @@ def augment(augment_size=None):
 
         for i in range(aug_size):
             sp = img_name.split('.')
-            img_outfile = '%s/%s-%02d.%s' % (FLAGS.img_out_dir, sp[0], i, sp[-1])
-            xml_outfile = '%s/%s-%02d.xml' % (FLAGS.annot_out_dir, sp[0], i)
+            img_outfile = '%s/%s-%02d.%s' % (FLAGS.image_output_dir, sp[0], i, sp[-1])
+            xml_outfile = '%s/%s-%02d.xml' % (FLAGS.annot_output_dir, sp[0], i)
 
             seq_det = seq.to_deterministic()
 
-            image = cv2.imread('%s/%s' % (FLAGS.img_src_dir, img_name))
+            image = cv2.imread('%s/%s' % (FLAGS.image_source_dir, img_name))
             _bbs = []
             for obj in source_root.findall('./object'):
                 bbox = obj.find('bndbox')
