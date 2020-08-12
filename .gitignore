@@ -1,0 +1,9 @@
+.idea/
+.ipynb_checkpoints/*
+checkpoints/*
+data/*
+logs/*
+migrations/
+output.jpg
+*.db
+*.pyc
