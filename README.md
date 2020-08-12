@@ -2,9 +2,18 @@
 ## Convert raw data to yolo-PASCAL style 
 1. annotation xmls' converted & copied to Annotations
 1. images preprocessed & copied to JPEGImages
-1. TODO! data augmentation
 ```test
-python fc2voc.py
+python fc2voc.py 
+    --annot_source_dir FC_1.0_offline_extension/DB/annotation
+    --annot_output_dir FC_offline/Annotations
+    --image_source_dir FC_1.0_offline_extension/DB/images
+    --image_output_dir FC_offline/JPEGImages
+```
+
+## Augmentation
+1. Augment with imgaug
+```aug
+python 
 ```
 
 ## Generate training / validation / test dataset

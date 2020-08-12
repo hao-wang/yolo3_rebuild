@@ -127,6 +127,7 @@ def convert_xml(file_path):
     tree = etree.ElementTree(target_root)
 
     output_path = os.path.join(FLAGS.annot_output_dir, file_name)
+    print(output_path)
     tree.write(output_path, pretty_print=True)
 
 
