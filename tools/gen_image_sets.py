@@ -4,12 +4,7 @@ import glob
 import os
 import random
 
-data_dir = "FC_aug"
-flags.DEFINE_string("image_dir", "./data/%s/JPEGImages" % data_dir, "directory containing all images")
-flags.DEFINE_string("fileset_dir", "./data/%s/ImageSets/Main" % data_dir, "directory containing all file lists")
-flags.DEFINE_string("train_file", "./data/%s/ImageSets/Main/flowchart_train.txt" % data_dir, "file containing train set")
-flags.DEFINE_string("val_file", "./data/%s/ImageSets/Main/flowchart_val.txt" % data_dir, "file containing validation set")
-flags.DEFINE_string("test_file", "./data/%s/ImageSets/Main/flowchart_test.txt" % data_dir, "file containing test set")
+flags.DEFINE_string("data_dir", "./data/FC_offline", "directory containing all images")
 
 
 def write_imagesets(imageset, filepath):
@@ -39,13 +34,14 @@ def generate_imagesets(image_dir, is_pos=1):
 
 
 def main(_argv):
-    if not os.path.exists(FLAGS.fileset_dir):
-        os.makedirs(FLAGS.fileset_dir)
+    image_dir = os.path.join(FLAGS.data_dir, 'JPEGImages')
+    train_file = os.path.join(FLAGS.data_dir, 'ImageSets/Main/flowchart_train.txt')
+    val_file = os.path.join(FLAGS.data_dir, 'ImageSets/Main/flowchart_val.txt')
 
-    train_set, val_set, test_set = generate_imagesets(FLAGS.image_dir, 1)
-    write_imagesets(train_set, FLAGS.train_file)
-    write_imagesets(val_set, FLAGS.val_file)
-    write_imagesets(test_set, FLAGS.test_file)
+    train_set, val_set, test_set = generate_imagesets(image_dir, 1)
+    write_imagesets(train_set, train_file)
+    write_imagesets(val_set, val_file)
+    # write_imagesets(test_set, FLAGS.test_file)
 
 
 if __name__ == "__main__":
