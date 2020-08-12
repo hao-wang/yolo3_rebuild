@@ -34,6 +34,10 @@ def generate_imagesets(image_dir, is_pos=1):
 
 
 def main(_argv):
+    output_dir = os.path.join(FLAGS.data_dir, 'ImageSets/Main')
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
     image_dir = os.path.join(FLAGS.data_dir, 'JPEGImages')
     train_file = os.path.join(FLAGS.data_dir, 'ImageSets/Main/flowchart_train.txt')
     val_file = os.path.join(FLAGS.data_dir, 'ImageSets/Main/flowchart_val.txt')
