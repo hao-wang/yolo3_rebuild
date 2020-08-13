@@ -14,16 +14,12 @@ from yolov3_tf2.models import (
 from yolov3_tf2 import dataset
 from yolov3_tf2.utils import freeze_all
 
-data_dir = "./data"
-data_type = "FC_aug"
 flags.DEFINE_integer('size', 416, 'image_size')
-flags.DEFINE_string('dataset', os.path.join(data_dir, data_type, 'flowchart_train.tfrecord'), 'path to dataset')
-flags.DEFINE_string('val_dataset', os.path.join(data_dir, data_type, 'flowchart_val.tfrecord'), 'path to dataset')
-flags.DEFINE_string('classes', os.path.join(data_dir, 'flowchart.names'), 'path to classes file')
+flags.DEFINE_string('data_dir', './data', 'root data dir')
+flags.DEFINE_string('spec_dir', 'FC_offline', 'specific data')
 flags.DEFINE_integer('num_classes', 7, 'number of classes')
 flags.DEFINE_integer('batch_size', 8, 'batch size')
 flags.DEFINE_integer('epochs', 20, 'epochs')
-flags.DEFINE_string('weights', os.path.join(data_dir, 'yolov3.tf'), "initialization weights")
 flags.DEFINE_integer('weights_num_classes',
                      80,
                      'number of weights classes, specify num class for `weights` file '
@@ -52,8 +48,13 @@ def main(_argv):
     anchors = yolo_anchors
     anchor_masks = yolo_anchor_masks
 
-    if FLAGS.dataset:
-        train_dataset = dataset.load_tfrecord_dataset(FLAGS.dataset, FLAGS.classes, FLAGS.size)
+    train_data = os.path.join(FLAGS.data_dir, FLAGS.spec_dir, 'flowchart_train.tfrecord')
+    val_data = os.path.join(FLAGS.data_dir, FLAGS.spec_dir, 'flowchart_val.tfrecord')
+    classes = os.path.join(FLAGS.data_dir, 'flowchart.names')
+    weights = os.path.join(FLAGS.data_dir, 'yolov3.tf')
+
+    if train_data:
+        train_dataset = dataset.load_tfrecord_dataset(train_data, classes, FLAGS.size)
     else:
         train_dataset = dataset.load_fake_dataset()
 
@@ -64,9 +65,9 @@ def main(_argv):
         dataset.transform_targets(y, anchors, anchor_masks, FLAGS.size)))
     train_dataset = train_dataset.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
 
-    if FLAGS.val_dataset:
+    if val_data:
         val_dataset = dataset.load_tfrecord_dataset(
-            FLAGS.val_dataset, FLAGS.classes, FLAGS.size)
+            val_data, classes, FLAGS.size)
     else:
         val_dataset = dataset.load_fake_dataset()
 
@@ -76,7 +77,7 @@ def main(_argv):
         dataset.transform_targets(y, anchors, anchor_masks, FLAGS.size)))
 
     model_pretrained = yolo_v3(FLAGS.size, training=True, classes=FLAGS.weights_num_classes or FLAGS.num_classes)
-    model_pretrained.load_weights(FLAGS.weights)
+    model_pretrained.load_weights(weights)
 
     model.get_layer('yolo_darknet').set_weights(
         model_pretrained.get_layer('yolo_darknet').get_weights()
