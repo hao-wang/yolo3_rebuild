@@ -8,10 +8,9 @@ import tensorflow as tf
 import lxml.etree
 import tqdm
 
-data_type = "FC_aug"
-flags.DEFINE_string('data_dir', os.path.join("./data", data_type), 'path to raw dataset')
+flags.DEFINE_string('root_dir', "./data", 'path to raw dataset')
+flags.DEFINE_string('spec_dir', "FC_offline", 'path to specific data')
 flags.DEFINE_enum('split', 'train', ['train', 'val'], 'specify train or val spit')
-flags.DEFINE_string('classes', os.path.join("./data", 'flowchart.names'), 'classes file')
 
 
 def build_example(annotation, class_map):
@@ -24,7 +23,7 @@ def build_example(annotation, class_map):
     :return: tf.train.Example (a key->feature mapping)
     """
     img_path = os.path.join(
-        FLAGS.data_dir, 'JPEGImages', annotation['filename'])
+        FLAGS.root_dir, FLAGS.spec_dir, 'JPEGImages', annotation['filename'])
     img_raw = open(img_path, 'rb').read()
     key = hashlib.sha256(img_raw).hexdigest()
 
@@ -80,21 +79,24 @@ def parse_xml(xml):
 
 
 def main(_argv):
+    classes = os.path.join(FLAGS.root_dir, "flowchart.names")
+    data_dir = os.path.join(FLAGS.root_dir, FLAGS.spec_dir)
+
     class_map = {name: idx for idx, name in enumerate(
-        open(FLAGS.classes).read().splitlines())}
+        open(classes).read().splitlines())}
     logging.info("Class mapping loaded: %s", class_map)
 
     image_list = open(os.path.join(
-        FLAGS.data_dir, 'ImageSets', 'Main', 'flowchart_%s.txt' % FLAGS.split)).read().splitlines()
+        data_dir, 'ImageSets', 'Main', 'flowchart_%s.txt' % FLAGS.split)).read().splitlines()
     logging.info("Image list loaded: %d", len(image_list))
 
-    output_file = os.path.join(FLAGS.data_dir, 'flowchart_%s.tfrecord' % FLAGS.split)
+    output_file = os.path.join(data_dir, 'flowchart_%s.tfrecord' % FLAGS.split)
 
     writer = tf.io.TFRecordWriter(output_file)
     for image in tqdm.tqdm(image_list):
         name, _ = image.split()
         annotation_xml = os.path.join(
-            FLAGS.data_dir, 'Annotations', name + '.xml')
+            FLAGS.root_dir, 'Annotations', name + '.xml')
         annotation_xml = lxml.etree.fromstring(open(annotation_xml).read())
         annotation = parse_xml(annotation_xml)['annotation']
         tf_example = build_example(annotation, class_map)
