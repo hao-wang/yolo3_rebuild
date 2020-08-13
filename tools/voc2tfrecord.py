@@ -96,7 +96,7 @@ def main(_argv):
     for image in tqdm.tqdm(image_list):
         name, _ = image.split()
         annotation_xml = os.path.join(
-            FLAGS.root_dir, 'Annotations', name + '.xml')
+            data_dir, 'Annotations', name + '.xml')
         annotation_xml = lxml.etree.fromstring(open(annotation_xml).read())
         annotation = parse_xml(annotation_xml)['annotation']
         tf_example = build_example(annotation, class_map)
