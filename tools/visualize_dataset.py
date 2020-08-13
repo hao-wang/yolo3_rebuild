@@ -3,6 +3,7 @@ from absl.flags import FLAGS
 import cv2
 import numpy as np
 
+import os
 import sys
 
 sys.path.append('/Users/hao/Projects/wuzhi-ai/yolo3_rebuild')
@@ -10,23 +11,21 @@ from yolov3_tf2.dataset import load_tfrecord_dataset
 from yolov3_tf2.models import yolo_v3  # not used; only to import FLAGS.yolo_max_boxes
 from yolov3_tf2.utils import draw_outputs
 
-data_type = "FC_aug"
-flags.DEFINE_string('classes',
-                    './data/flowchart.names',
-                    'path to classes file')
+flags.DEFINE_string('root_dir', './data', 'root data dir.')
+flags.DEFINE_string('spec_dir', 'FC_offline', 'specific data set dir.')
 flags.DEFINE_integer('size', 416, 'resize images to')
-flags.DEFINE_string('dataset',
-                    './data/%s/flowchart_train.tfrecord' % data_type,
-                    'path to dataset')
 flags.DEFINE_string('output', './output.jpg', 'path to output image')
 
 
 def main(_argv):
-    class_names = [c.strip() for c in open(FLAGS.classes).readlines()]
+    classes = os.path.join(FLAGS.root_dir, 'flowchart.names')
+    dataset = os.path.join(FLAGS.root_dir, FLAGS.spec_dir, 'flowchart_train.tfrecord')
+
+    class_names = [c.strip() for c in open(classes).readlines()]
     logging.info('classes loaded')
 
-    dataset = load_tfrecord_dataset(FLAGS.dataset, FLAGS.classes, FLAGS.size)
-    dataset = dataset.shuffle(512)
+    dataset = load_tfrecord_dataset(dataset, classes, FLAGS.size)
+    dataset = dataset.shuffle(128)
 
     for image, labels in dataset.take(1):
         boxes = []
