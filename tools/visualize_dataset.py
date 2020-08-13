@@ -6,7 +6,7 @@ import numpy as np
 import os
 import sys
 
-sys.path.append('/Users/hao/Projects/wuzhi-ai/yolo3_rebuild')
+sys.path.append('../yolo3_rebuild')
 from yolov3_tf2.dataset import load_tfrecord_dataset
 from yolov3_tf2.models import yolo_v3  # not used; only to import FLAGS.yolo_max_boxes
 from yolov3_tf2.utils import draw_outputs
