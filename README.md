@@ -1,6 +1,9 @@
 # Running steps
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/hao-wang/yolo3_rebuild/blob/master/driver.ipynb)
 
+**Main steps being reliable, the detailed parameters may be outdated. See above jupyter-notebook for the 
+latest version.**
+
 Simplified version of https://github.com/zzh8829/yolov3-tf2
 ## Convert raw data to yolo-PASCAL style 
 1. annotation xmls' converted & copied to Annotations
@@ -32,21 +35,21 @@ python voc2tfrecord.py
 
 ## Test everything is alright
 ```visualize
-python visualize_dataset.py --image JPEGImages/xx.png
+!python tools/visualize_dataset.py \
+  --root_dir $data_root \
+  --spec_dir FC_offline
 ```
 
 ## Train the model
 ```
-python train.py \
---dataset ./data/flowchart_train.tfrecord \
---val_dataset ./data/flowchart_val.tfrecord \
---classes ./data/flowchart.names \
---mode fit --transfer darknet \
---batch_size 8 \
---epochs 20 \
---weights ./checkpoints/yolov3.tf \
---weights_num_classes 80 \
---num_classes 7
+!python train.py \
+    --root_dir $data_root \
+    --spec_dir FC_offline \
+    --mode fit --transfer darknet \
+    --batch_size 8 \
+    --epochs 20 \
+    --weights_num_classes 80 \
+    --num_classes 7
 ```
 
 ## Serve the model

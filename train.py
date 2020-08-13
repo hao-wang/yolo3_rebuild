@@ -15,7 +15,7 @@ from yolov3_tf2 import dataset
 from yolov3_tf2.utils import freeze_all
 
 flags.DEFINE_integer('size', 416, 'image_size')
-flags.DEFINE_string('data_dir', './data', 'root data dir')
+flags.DEFINE_string('root_dir', './data', 'root data dir')
 flags.DEFINE_string('spec_dir', 'FC_offline', 'specific data')
 flags.DEFINE_integer('num_classes', 7, 'number of classes')
 flags.DEFINE_integer('batch_size', 8, 'batch size')
@@ -48,10 +48,15 @@ def main(_argv):
     anchors = yolo_anchors
     anchor_masks = yolo_anchor_masks
 
-    train_data = os.path.join(FLAGS.data_dir, FLAGS.spec_dir, 'flowchart_train.tfrecord')
-    val_data = os.path.join(FLAGS.data_dir, FLAGS.spec_dir, 'flowchart_val.tfrecord')
-    classes = os.path.join(FLAGS.data_dir, 'flowchart.names')
-    weights = os.path.join(FLAGS.data_dir, 'yolov3.tf')
+    train_data = os.path.join(FLAGS.root_dir, FLAGS.spec_dir, 'flowchart_train.tfrecord')
+    val_data = os.path.join(FLAGS.root_dir, FLAGS.spec_dir, 'flowchart_val.tfrecord')
+    classes = os.path.join(FLAGS.root_dir, 'flowchart.names')
+    weights = os.path.join(FLAGS.root_dir, 'yolov3.tf')
+
+    checkpoint_dir = os.path.join(FLAGS.root_dir, "checkpoints")
+    print(checkpoint_dir)
+    if not os.path.exists(checkpoint_dir):
+        os.makedirs(checkpoint_dir)
 
     if train_data:
         train_dataset = dataset.load_tfrecord_dataset(train_data, classes, FLAGS.size)
@@ -92,7 +97,7 @@ def main(_argv):
     callback_list = [
         ReduceLROnPlateau(verbose=1),
         EarlyStopping(patience=3, verbose=1),
-        ModelCheckpoint('checkpoints/yolov3_train_{epoch}.tf',
+        ModelCheckpoint(os.path.join(checkpoint_dir, 'yolov3_train_{epoch}.tf'),
                         verbose=1, save_weights_only=True),
         TensorBoard(log_dir='logs')
     ]
