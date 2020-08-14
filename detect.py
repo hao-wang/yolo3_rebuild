@@ -29,7 +29,7 @@ def main(_argv):
         weights = os.path.join(checkpoint_path, FLAGS.checkpoint)
     else:
         weights = tf.train.latest_checkpoint(checkpoint_path)
-    image = os.path.join(FLAGS.root_dir, FLAGS.spec_dir, 'JPEGImages', 'writer000_fc_001.png')
+    image = os.path.join(FLAGS.root_dir, FLAGS.spec_dir, 'JPEGImages', FLAGS.image)
 
     yolo = yolo_v3(classes=FLAGS.num_classes)
     yolo.load_weights(weights).expect_partial()
