@@ -4,7 +4,8 @@ import glob
 import os
 import random
 
-flags.DEFINE_string("data_dir", "./data/FC_offline", "directory containing all images")
+flags.DEFINE_string("root_dir", "./data", "directory containing all images")
+flags.DEFINE_string("spec_dir", "FC_offline", "specific data used.")
 
 
 def write_imagesets(imageset, filepath):
