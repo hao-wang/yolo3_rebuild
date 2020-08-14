@@ -15,6 +15,10 @@ from yolov3_tf2 import dataset
 from yolov3_tf2.utils import freeze_all
 
 flags.DEFINE_integer('size', 416, 'image_size')
+flags.DEFINE_enum('start_from',
+                    'flowchart',
+                    ['flowchart', 'yolo'],
+                    'continue from last training, or yolo')
 flags.DEFINE_string('root_dir', './data', 'root data dir')
 flags.DEFINE_string('spec_dir', 'FC_offline', 'specific data')
 flags.DEFINE_integer('num_classes', 7, 'number of classes')
@@ -32,7 +36,7 @@ flags.DEFINE_enum('mode',
                   'eager_tf: custom GradientTape')
 flags.DEFINE_enum('transfer',
                   'darknet',
-                  ['darknet'],
+                  ['none', 'darknet', 'fine_tune', 'frozen'],
                   'transfer learning mode, '
                   'none: training from scratch, '
                   'darknet: transfer darknet, '  # inherit & freeze darknet weights, other layers from scratch
@@ -51,9 +55,10 @@ def main(_argv):
     train_data = os.path.join(FLAGS.root_dir, FLAGS.spec_dir, 'flowchart_train.tfrecord')
     val_data = os.path.join(FLAGS.root_dir, FLAGS.spec_dir, 'flowchart_val.tfrecord')
     classes = os.path.join(FLAGS.root_dir, 'flowchart.names')
-    weights = os.path.join(FLAGS.root_dir, 'yolov3.tf')
-
     checkpoint_dir = os.path.join(FLAGS.root_dir, "checkpoints")
+
+    weights = os.path.join(checkpoint_dir, 'yolov3.tf')
+
     print(checkpoint_dir)
     if not os.path.exists(checkpoint_dir):
         os.makedirs(checkpoint_dir)
@@ -81,13 +86,26 @@ def main(_argv):
         dataset.transform_images(x, FLAGS.size),
         dataset.transform_targets(y, anchors, anchor_masks, FLAGS.size)))
 
-    model_pretrained = yolo_v3(FLAGS.size, training=True, classes=FLAGS.weights_num_classes or FLAGS.num_classes)
-    model_pretrained.load_weights(weights)
+    if FLAGS.start_from == "flowchart":
+        latest = tf.train.latest_checkpoint(checkpoint_dir)
+        model.load_weights(latest)
 
-    model.get_layer('yolo_darknet').set_weights(
-        model_pretrained.get_layer('yolo_darknet').get_weights()
-    )
-    freeze_all(model.get_layer('yolo_darknet'))
+    else:
+        if FLAGS.transfer in ['darknet', 'no_output']:
+            model_pretrained = yolo_v3(FLAGS.size, training=True,
+                                       classes=FLAGS.weights_num_classes or FLAGS.num_classes)
+            model_pretrained.load_weights(weights)
+
+            model.get_layer('yolo_darknet').set_weights(
+                model_pretrained.get_layer('yolo_darknet').get_weights()
+            )
+            freeze_all(model.get_layer('yolo_darknet'))
+        elif FLAGS.transfer in ['fine_tune', 'frozen']:
+            model.load_weights(weights)
+            if FLAGS.transfer == "fine_tune":
+                freeze_all(model.get_layer("yolo_darknet"))
+            else:
+                freeze_all(model)
 
     optimizer = tf.keras.optimizers.Adam(lr=FLAGS.learning_rate)
     loss = [yolo_loss(anchors[mask], classes=FLAGS.num_classes) for mask in anchor_masks]
@@ -97,7 +115,7 @@ def main(_argv):
     callback_list = [
         ReduceLROnPlateau(verbose=1),
         EarlyStopping(patience=3, verbose=1),
-        ModelCheckpoint(os.path.join(checkpoint_dir, 'yolov3_train_{epoch}.tf'),
+        ModelCheckpoint(os.path.join(checkpoint_dir, 'flowchart_{epoch}.tf'),
                         verbose=1, save_weights_only=True),
         TensorBoard(log_dir='logs')
     ]

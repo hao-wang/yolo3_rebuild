@@ -9,7 +9,7 @@ from yolov3_tf2.utils import draw_outputs
 
 flags.DEFINE_string('root_dir', './data', 'root data dir.')
 flags.DEFINE_string('spec_dir', 'FC_offline', 'specific data set dir.')
-flags.DEFINE_string('checkpoint', 'yolov3_train_20.tf', 'specific data set dir.')
+flags.DEFINE_string('checkpoint', None, 'specific data set dir.')
 flags.DEFINE_string('image', 'writer000_fc_001.png', 'specific image')
 flags.DEFINE_string('output', 'output.jpg', 'output image path')
 flags.DEFINE_integer('num_classes', 7, 'number of classes in the model')
@@ -18,15 +18,17 @@ flags.DEFINE_integer('size', 416, "image size as network's input")
 
 def main(_argv):
     """
-    CPU only.
-
     :return:
     """
     classes = os.path.join(FLAGS.root_dir, 'flowchart.names')
     checkpoint_path = os.path.join(FLAGS.root_dir, 'checkpoints')
     if not os.path.exists(checkpoint_path):
         os.makedirs(checkpoint_path)
-    weights = os.path.join(checkpoint_path, FLAGS.checkpoint)
+
+    if FLAGS.checkpoint:
+        weights = os.path.join(checkpoint_path, FLAGS.checkpoint)
+    else:
+        weights = tf.train.latest_checkpoint(checkpoint_path)
     image = os.path.join(FLAGS.root_dir, FLAGS.spec_dir, 'JPEGImages', 'writer000_fc_001.png')
 
     yolo = yolo_v3(classes=FLAGS.num_classes)
@@ -45,6 +47,7 @@ def main(_argv):
     img = cv2.cvtColor(img_raw.numpy(), cv2.COLOR_RGB2BGR)
     img = draw_outputs(img, (boxes, scores, classes, nums), class_names)
 
+    print("output image")
     cv2.imwrite(FLAGS.output, img)
 
 
