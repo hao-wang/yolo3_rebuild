@@ -39,8 +39,11 @@ def augment(augment_size=None):
     aug_size = augment_size or FLAGS.augment_size
 
     seq = sequence.get()
-    for fn in glob.glob(FLAGS.annot_source_dir+'/*'):
+    for fn in sorted(glob.glob(FLAGS.annot_source_dir+'/*')):
         print(fn)
+        if '-' in fn:  # If it's from augmentation, then ignore.
+            continue
+
         stree = ET.parse(open(fn, 'r'))
         source_root = stree.getroot()
         img_name = source_root.find('./filename').text
