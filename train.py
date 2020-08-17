@@ -45,6 +45,7 @@ flags.DEFINE_enum('transfer',
                   'fine_tune: transfer all and freeze darknet only.'  # inherit all weights, freeze only darknet
                   )
 flags.DEFINE_float('learning_rate', 1e-3, 'learning rate')
+flags.DEFINE_string('logdir', './logs', 'log directory')
 
 
 def main(_argv):
@@ -118,7 +119,7 @@ def main(_argv):
         EarlyStopping(patience=3, verbose=1),
         ModelCheckpoint(os.path.join(checkpoint_dir, 'flowchart_{epoch}.tf'),
                         verbose=1, save_weights_only=True),
-        TensorBoard(log_dir='logs')
+        TensorBoard(log_dir=FLAGS.logdir)
     ]
 
     history = model.fit(train_dataset,
