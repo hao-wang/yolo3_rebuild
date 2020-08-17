@@ -88,8 +88,9 @@ def main(_argv):
 
     if FLAGS.start_from == "flowchart":
         latest = tf.train.latest_checkpoint(checkpoint_dir)
+        print("loading weights from %s" % latest)
         model.load_weights(latest)
-
+        freeze_all(model.get_layer("yolo_darknet"))
     else:
         if FLAGS.transfer in ['darknet', 'no_output']:
             model_pretrained = yolo_v3(FLAGS.size, training=True,
