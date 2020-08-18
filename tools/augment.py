@@ -14,7 +14,7 @@ import xml.etree.ElementTree as ET
 
 
 flags.DEFINE_string("image_source_dir",
-                    "/Users/hao/Projects/dataset/FC_1.0_offline_extension/DB/images",
+                    "./data/FC_offline/JPEGImages",
                     "image source directory")
 flags.DEFINE_string("annot_source_dir",
                     "./data/FC_offline/Annotations",
