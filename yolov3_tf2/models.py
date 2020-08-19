@@ -203,6 +203,11 @@ def yolo_nms(outputs, anchors, masks, classes):
     :param masks:
     :param classes:
     :return:
+        'nmsed_boxes': A [batch_size, max_detections, 4] float32 tensor containing the non-max suppressed boxes.
+        'nmsed_scores': A [batch_size, max_detections] float32 tensor containing the scores for the boxes.
+        'nmsed_classes': A [batch_size, max_detections] float32 tensor containing the class for boxes.
+        'valid_detections': A [batch_size] int32 tensor indicating the number of valid detections per batch item.
+        Only the top valid_detections[i] entries in nms_boxes[i], nms_scores[i] and nms_class[i] are valid; rest are 0.
     """
     b, c, t = [], [], []
     for op in outputs:
