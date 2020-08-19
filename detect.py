@@ -10,7 +10,7 @@ from yolov3_tf2.utils import draw_outputs
 flags.DEFINE_string('root_dir', './data', 'root data dir.')
 flags.DEFINE_string('spec_dir', 'FC_offline', 'specific data set dir.')
 flags.DEFINE_string('checkpoint', None, 'specific data set dir.')
-flags.DEFINE_string('image', 'writer000_fc_001.png', 'specific image')
+flags.DEFINE_string('image', 'writer023_fc_016-05.png', 'specific image')
 flags.DEFINE_string('output', 'output.jpg', 'output image path')
 flags.DEFINE_integer('num_classes', 7, 'number of classes in the model')
 flags.DEFINE_integer('size', 416, "image size as network's input")
