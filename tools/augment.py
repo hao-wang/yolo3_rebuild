@@ -71,7 +71,7 @@ def augment(augment_size=None):
                 pass
 
 
-@timeout_decorator.timeout(15)
+@timeout_decorator.timeout(8)
 def generate_one_aug(image, img_name, bbs, source_root, i, seq):
     sp = img_name.split('.')
 
