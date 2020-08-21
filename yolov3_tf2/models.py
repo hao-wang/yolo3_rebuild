@@ -166,7 +166,7 @@ def yolo_boxes(pred, anchors, classes):
     :param anchors:
     :param classes:
     :return:
-        bbox - shape (batch_size, grid, grid, anchors, 4);
+        bbox - shape (batch_size, grid, grid, anchors, (x1,y1,x2,y2));
         objectness - (batch_size, )
         class_probs - (batch_size, classes, )
         pred_box - (batch_size, grid, grid, anchors, 4)
