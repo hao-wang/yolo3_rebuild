@@ -25,7 +25,7 @@ python
 ## Generate training / validation / test dataset
 Better to make sure the sizes' are multiples of *batch_size*.
 ```generate sets
-python gen_image_sets.py
+python tools/gen_image_sets.py
 ```
 
 ## Turn data into .tfrecord files

@@ -60,9 +60,11 @@ def main(_argv):
 
     weights = os.path.join(checkpoint_dir, 'yolov3.tf')
 
-    print(checkpoint_dir)
     if not os.path.exists(checkpoint_dir):
+        print(checkpoint_dir)
         os.makedirs(checkpoint_dir)
+    else:
+        print("writing to %s" % checkpoint_dir)
 
     if train_data:
         train_dataset = dataset.load_tfrecord_dataset(train_data, classes, FLAGS.size)
